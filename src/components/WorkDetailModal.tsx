@@ -67,6 +67,10 @@ function WorkDetailModal({ work, onClose }: WorkDetailModalProps) {
               <dd>{work.category}</dd>
             </div>
             <div>
+              <dt>原图尺寸</dt>
+              <dd>{work.dimensions.label}</dd>
+            </div>
+            <div>
               <dt>作品说明</dt>
               <dd>{work.description}</dd>
             </div>

@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
 import About from './components/About';
-import ArchiveGrid from './components/ArchiveGrid';
 import Commission from './components/Commission';
 import Contact from './components/Contact';
-import FeaturedWorks from './components/FeaturedWorks';
-import Hero from './components/Hero';
+import MaterialLibrary from './components/MaterialLibrary';
 import Navbar from './components/Navbar';
 import WorkDetailModal from './components/WorkDetailModal';
 import { works, type Work } from './data/works';
@@ -41,9 +39,7 @@ function App() {
     <>
       <Navbar />
       <main>
-        <Hero works={works} onSelectWork={setSelectedWork} />
-        <FeaturedWorks works={works.filter((work) => work.featured)} onSelectWork={setSelectedWork} />
-        <ArchiveGrid works={works} onSelectWork={setSelectedWork} />
+        <MaterialLibrary works={works} onSelectWork={setSelectedWork} />
         <Commission />
         <About />
         <Contact />

@@ -18,6 +18,12 @@ export type Work = {
   orientation: 'portrait' | 'landscape' | 'square';
   focus: string;
   aspectRatio: string;
+  dimensions: {
+    width: number;
+    height: number;
+    label: string;
+  };
+  accessNote: string;
 };
 
 export const works: Work[] = [
@@ -35,6 +41,12 @@ export const works: Work[] = [
     orientation: 'portrait',
     focus: 'center 18%',
     aspectRatio: '2 / 3',
+    dimensions: {
+      width: 7200,
+      height: 10800,
+      label: '7200 × 10800',
+    },
+    accessNote: '原图可领取',
   },
   {
     id: 'huahua-blonde-profile',
@@ -50,6 +62,12 @@ export const works: Work[] = [
     orientation: 'portrait',
     focus: 'center 34%',
     aspectRatio: '3 / 4',
+    dimensions: {
+      width: 5400,
+      height: 7200,
+      label: '5400 × 7200',
+    },
+    accessNote: '原图可领取',
   },
   {
     id: 'huahua-field-scene',
@@ -65,6 +83,12 @@ export const works: Work[] = [
     orientation: 'portrait',
     focus: '42% 24%',
     aspectRatio: '3 / 4',
+    dimensions: {
+      width: 5400,
+      height: 7200,
+      label: '5400 × 7200',
+    },
+    accessNote: '原图可领取',
   },
   {
     id: 'luyuxiao-profile',
@@ -80,6 +104,12 @@ export const works: Work[] = [
     orientation: 'landscape',
     focus: 'center 42%',
     aspectRatio: '16 / 9',
+    dimensions: {
+      width: 7680,
+      height: 4320,
+      label: '7680 × 4320',
+    },
+    accessNote: '原图可领取',
   },
 ];
 
