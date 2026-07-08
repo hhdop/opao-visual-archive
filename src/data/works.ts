@@ -24,6 +24,10 @@ export type Work = {
     label: string;
   };
   accessNote: string;
+  downloadLinks: {
+    baidu: string;
+    quark: string;
+  };
 };
 
 export const works: Work[] = [
@@ -47,6 +51,10 @@ export const works: Work[] = [
       label: '7200 × 10800',
     },
     accessNote: '原图可领取',
+    downloadLinks: {
+      baidu: '#',
+      quark: '#',
+    },
   },
   {
     id: 'huahua-blonde-profile',
@@ -68,6 +76,10 @@ export const works: Work[] = [
       label: '5400 × 7200',
     },
     accessNote: '原图可领取',
+    downloadLinks: {
+      baidu: '#',
+      quark: '#',
+    },
   },
   {
     id: 'huahua-field-scene',
@@ -89,6 +101,10 @@ export const works: Work[] = [
       label: '5400 × 7200',
     },
     accessNote: '原图可领取',
+    downloadLinks: {
+      baidu: '#',
+      quark: '#',
+    },
   },
   {
     id: 'luyuxiao-profile',
@@ -110,6 +126,10 @@ export const works: Work[] = [
       label: '7680 × 4320',
     },
     accessNote: '原图可领取',
+    downloadLinks: {
+      baidu: '#',
+      quark: '#',
+    },
   },
 ];
 

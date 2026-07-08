@@ -1,5 +1,5 @@
 import { useMemo, useState, type CSSProperties } from 'react';
-import { categories, type Work, type WorkCategory } from '../data/works';
+import type { Work } from '../data/works';
 
 type MaterialLibraryProps = {
   works: Work[];
@@ -13,13 +13,12 @@ type LibraryGroup = {
   works: Work[];
 };
 
-const categoryCopy: Record<WorkCategory | 'All', string> = {
-  All: '全部',
-  'Fan Portraits': '明星同人',
-  'Selected Works': '精选作品',
-  'Original Sketches': '原创练习',
-  'Commission Reference': '约稿参考',
-};
+const libraryFilters: Array<{ label: string; value: Work['orientation'] | 'All' }> = [
+  { label: '全部', value: 'All' },
+  { label: '竖图', value: 'portrait' },
+  { label: '横图', value: 'landscape' },
+  { label: '方图', value: 'square' },
+];
 
 function getGroupTitle(work: Work) {
   if (work.orientation === 'landscape') {
@@ -46,17 +45,16 @@ function getGroupNote(work: Work) {
 }
 
 function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
-  const [activeCategory, setActiveCategory] = useState<WorkCategory | 'All'>('All');
+  const [activeFilter, setActiveFilter] = useState<Work['orientation'] | 'All'>('All');
   const [query, setQuery] = useState('');
 
   const filteredWorks = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
     return works.filter((work) => {
-      const matchesCategory = activeCategory === 'All' || work.category === activeCategory;
+      const matchesFilter = activeFilter === 'All' || work.orientation === activeFilter;
       const searchableText = [
         work.title,
-        work.category,
         work.dimensions.label,
         work.orientation,
         ...work.tags,
@@ -64,9 +62,9 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
         .join(' ')
         .toLowerCase();
 
-      return matchesCategory && (!normalizedQuery || searchableText.includes(normalizedQuery));
+      return matchesFilter && (!normalizedQuery || searchableText.includes(normalizedQuery));
     });
-  }, [activeCategory, query, works]);
+  }, [activeFilter, query, works]);
 
   const groups = useMemo(() => {
     const groupMap = new Map<string, LibraryGroup>();
@@ -113,14 +111,14 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
         </div>
 
         <nav className="library-tabs" aria-label="作品分类">
-          {categories.map((category) => (
+          {libraryFilters.map((filter) => (
             <button
-              key={category.value}
-              className={category.value === activeCategory ? 'is-active' : ''}
+              key={filter.value}
+              className={filter.value === activeFilter ? 'is-active' : ''}
               type="button"
-              onClick={() => setActiveCategory(category.value)}
+              onClick={() => setActiveFilter(filter.value)}
             >
-              {categoryCopy[category.value]}
+              {filter.label}
             </button>
           ))}
         </nav>
@@ -164,26 +162,14 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
                         <span className="asset-title-line">
                           <i aria-hidden="true" />
                           <strong>{work.title}</strong>
-                          <em>原图</em>
+                          <em>{work.accessNote}</em>
                         </span>
                         <span className="asset-meta">
-                          {categoryCopy[work.category]}　{work.dimensions.label}　{work.year}
+                          创作于 {work.year}　{work.dimensions.label}
                         </span>
-                        <span className="asset-tags">{work.tags.slice(0, 4).join('　')}</span>
+                        <span className="asset-links">百度网盘 / 夸克网盘</span>
                       </span>
                     </button>
-                  ))}
-                  {Array.from({ length: Math.max(0, 4 - group.works.length) }).map((_, index) => (
-                    <div className="asset-card asset-placeholder" key={`${group.key}-placeholder-${index}`}>
-                      <span className="asset-thumb" aria-hidden="true" />
-                      <span className="asset-copy">
-                        <span className="asset-title-line">
-                          <i aria-hidden="true" />
-                          <strong>预留作品位</strong>
-                        </span>
-                        <span className="asset-meta">后续替换同尺寸作品</span>
-                      </span>
-                    </div>
                   ))}
                 </div>
               </section>
