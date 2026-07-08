@@ -1,9 +1,6 @@
 const navItems = [
-  { label: '首页', href: '#home' },
-  { label: '作品归档', href: '#archive' },
+  { label: '作品库', href: '#home' },
   { label: '原图领取', href: '#archive' },
-  { label: '关于', href: '#about' },
-  { label: '联系', href: '#contact' },
 ];
 
 function Navbar() {

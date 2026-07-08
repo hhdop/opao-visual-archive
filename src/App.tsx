@@ -1,7 +1,4 @@
-import { useEffect, useState } from 'react';
-import About from './components/About';
-import Commission from './components/Commission';
-import Contact from './components/Contact';
+import { useState } from 'react';
 import MaterialLibrary from './components/MaterialLibrary';
 import Navbar from './components/Navbar';
 import WorkDetailModal from './components/WorkDetailModal';
@@ -10,40 +7,16 @@ import { works, type Work } from './data/works';
 function App() {
   const [selectedWork, setSelectedWork] = useState<Work | null>(null);
 
-  useEffect(() => {
-    const targets = Array.from(document.querySelectorAll<HTMLElement>('.scroll-reveal'));
-
-    if (!targets.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      targets.forEach((target) => target.classList.add('is-visible'));
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.16 },
-    );
-
-    targets.forEach((target) => observer.observe(target));
-
-    return () => observer.disconnect();
-  }, []);
-
   return (
     <>
       <Navbar />
       <main>
         <MaterialLibrary works={works} onSelectWork={setSelectedWork} />
-        <Commission />
-        <About />
-        <Contact />
       </main>
+      <footer className="site-footer-lite">
+        <span>© 2026 画画的 o 泡 Visual Archive.</span>
+        <span>作品原图请在作品详情中查看百度网盘 / 夸克网盘入口。</span>
+      </footer>
       <WorkDetailModal work={selectedWork} onClose={() => setSelectedWork(null)} />
     </>
   );

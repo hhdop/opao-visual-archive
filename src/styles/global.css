@@ -6173,6 +6173,14 @@ body::after {
   color: rgba(226, 186, 125, 0.76);
 }
 
+.modal-meta-line {
+  margin: -6px 0 18px;
+  color: rgba(255, 250, 240, 0.62);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.7;
+}
+
 .detail-list div {
   grid-template-columns: 116px minmax(0, 1fr);
 }
@@ -6215,6 +6223,25 @@ body::after {
 .modal-actions .button {
   width: auto;
   min-width: 132px;
+}
+
+.site-footer-lite {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 28px max(28px, calc((100vw - 1680px) / 2 + 28px));
+  border-top: 1px solid rgba(25, 26, 29, 0.08);
+  background: #fbfbfa;
+  color: rgba(25, 26, 29, 0.44);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 720px) {
+  .site-footer-lite {
+    flex-direction: column;
+    padding: 24px 14px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

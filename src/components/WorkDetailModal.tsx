@@ -52,20 +52,7 @@ function WorkDetailModal({ work, onClose }: WorkDetailModalProps) {
           <p className="section-label">Artwork File</p>
           <h2 id="work-modal-title">{work.title}</h2>
 
-          <dl className="detail-list">
-            <div>
-              <dt>作品名称</dt>
-              <dd>{work.title}</dd>
-            </div>
-            <div>
-              <dt>创作年份</dt>
-              <dd>{work.year}</dd>
-            </div>
-            <div>
-              <dt>原图尺寸</dt>
-              <dd>{work.dimensions.label}</dd>
-            </div>
-          </dl>
+          <p className="modal-meta-line">创作于 {work.year}　{work.dimensions.label}</p>
 
           <div className="modal-access" aria-label="作品原图领取入口">
             <p>原图领取</p>
