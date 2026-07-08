@@ -21,6 +21,8 @@ const libraryFilters: Array<{ label: string; value: Work['orientation'] | 'All' 
   { label: '方图', value: 'square' },
 ];
 
+const subjectFilters = ['全部', '华晨宇', '侯明昊', '檀健次', '个人练习'] as const;
+
 function getOrientationLabel(work: Work) {
   if (work.orientation === 'landscape') {
     return '横图';
@@ -31,6 +33,28 @@ function getOrientationLabel(work: Work) {
   }
 
   return '竖图';
+}
+
+function getWorkSubject(work: Work) {
+  const source = `${work.title} ${work.tags.join(' ')}`;
+
+  if (source.includes('华晨宇')) {
+    return '华晨宇';
+  }
+
+  if (source.includes('侯明昊')) {
+    return '侯明昊';
+  }
+
+  if (source.includes('檀健次')) {
+    return '檀健次';
+  }
+
+  if (source.includes('个人练习') || source.includes('原创练习')) {
+    return '个人练习';
+  }
+
+  return '其他';
 }
 
 function getGroupTitle(work: Work) {
@@ -55,6 +79,7 @@ function hasPendingLinks(work: Work) {
 
 function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
   const [activeFilter, setActiveFilter] = useState<Work['orientation'] | 'All'>('All');
+  const [activeSubject, setActiveSubject] = useState<(typeof subjectFilters)[number]>('全部');
   const [query, setQuery] = useState('');
 
   const filteredWorks = useMemo(() => {
@@ -62,18 +87,20 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
 
     return works.filter((work) => {
       const matchesFilter = activeFilter === 'All' || work.orientation === activeFilter;
+      const matchesSubject = activeSubject === '全部' || getWorkSubject(work) === activeSubject;
       const searchableText = [
         work.title,
         work.dimensions.label,
         getOrientationLabel(work),
+        getWorkSubject(work),
         ...work.tags,
       ]
         .join(' ')
         .toLowerCase();
 
-      return matchesFilter && (!normalizedQuery || searchableText.includes(normalizedQuery));
+      return matchesFilter && matchesSubject && (!normalizedQuery || searchableText.includes(normalizedQuery));
     });
-  }, [activeFilter, query, works]);
+  }, [activeFilter, activeSubject, query, works]);
 
   const groups = useMemo(() => {
     const groupMap = new Map<string, LibraryGroup>();
@@ -136,8 +163,18 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
         <div className="library-toolbar" aria-label="作品筛选信息">
           <span className="toolbar-filter">筛选</span>
           <span className="is-active">最近更新</span>
-          <span>按尺寸分组</span>
-          <span>{filteredWorks.length} 件作品</span>
+          <div className="subject-filters" aria-label="人物分类">
+            {subjectFilters.map((subject) => (
+              <button
+                key={subject}
+                type="button"
+                className={subject === activeSubject ? 'is-active' : ''}
+                onClick={() => setActiveSubject(subject)}
+              >
+                {subject}
+              </button>
+            ))}
+          </div>
         </div>
 
         <div className="library-groups">
@@ -149,7 +186,6 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
                     <h2 id={`${group.key}-title`}>{group.title}</h2>
                     <p>{group.note}</p>
                   </div>
-                  <span>{group.works.length} items</span>
                 </div>
 
                 <div className={`asset-grid is-${group.works[0]?.orientation ?? 'portrait'}`}>
