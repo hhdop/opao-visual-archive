@@ -10,6 +10,7 @@ type LibraryGroup = {
   key: string;
   title: string;
   note: string;
+  firstIndex: number;
   works: Work[];
 };
 
@@ -20,28 +21,36 @@ const libraryFilters: Array<{ label: string; value: Work['orientation'] | 'All' 
   { label: '方图', value: 'square' },
 ];
 
-function getGroupTitle(work: Work) {
+function getOrientationLabel(work: Work) {
   if (work.orientation === 'landscape') {
-    return `横图 ${work.dimensions.label}`;
+    return '横图';
   }
 
   if (work.orientation === 'square') {
-    return `方图 ${work.dimensions.label}`;
+    return '方图';
   }
 
-  return `竖图 ${work.dimensions.label}`;
+  return '竖图';
+}
+
+function getGroupTitle(work: Work) {
+  return `${getOrientationLabel(work)} ${work.dimensions.label}`;
 }
 
 function getGroupNote(work: Work) {
   if (work.orientation === 'landscape') {
-    return '适合横幅、头图、宽屏预览。';
+    return '同一横向比例的作品会收在这一排，适合头图、宽屏预览和横幅展示。';
   }
 
   if (work.orientation === 'square') {
-    return '适合头像、封面与社媒预览。';
+    return '同一方图比例的作品会收在这一排，适合头像、封面和社媒预览。';
   }
 
-  return '适合原图领取、长图浏览与作品细节查看。';
+  return '同一竖向尺寸的作品会收在这一排，方便之后继续补图和整理原图链接。';
+}
+
+function hasPendingLinks(work: Work) {
+  return work.downloadLinks.baidu === '#' && work.downloadLinks.quark === '#';
 }
 
 function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
@@ -56,7 +65,7 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
       const searchableText = [
         work.title,
         work.dimensions.label,
-        work.orientation,
+        getOrientationLabel(work),
         ...work.tags,
       ]
         .join(' ')
@@ -69,15 +78,16 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
   const groups = useMemo(() => {
     const groupMap = new Map<string, LibraryGroup>();
 
-    filteredWorks.forEach((work) => {
+    filteredWorks.forEach((work, index) => {
       const title = getGroupTitle(work);
-      const key = `${work.orientation}-${work.dimensions.label}`;
+      const key = `${work.orientation}-${work.dimensions.width}x${work.dimensions.height}`;
 
       if (!groupMap.has(key)) {
         groupMap.set(key, {
           key,
           title,
           note: getGroupNote(work),
+          firstIndex: index,
           works: [],
         });
       }
@@ -90,20 +100,20 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
       const aOrder = order.findIndex((item) => a.key.startsWith(item));
       const bOrder = order.findIndex((item) => b.key.startsWith(item));
 
-      return aOrder - bOrder || a.title.localeCompare(b.title, 'zh-Hans-CN');
+      return aOrder - bOrder || b.works.length - a.works.length || a.firstIndex - b.firstIndex;
     });
   }, [filteredWorks]);
 
   return (
     <section className="library-page" id="home" aria-labelledby="library-title">
       <div className="library-shell">
-        <div className="library-search-row" id="archive" aria-labelledby="library-title">
-          <h1 id="library-title">作品素材库</h1>
+        <div className="library-search-row" id="archive">
+          <h1 id="library-title">画画的 o 泡作品库</h1>
           <label className="library-search">
             <input
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="搜索作品名、标签、尺寸..."
+              placeholder="搜索作品名、尺寸、标签..."
               aria-label="搜索作品"
             />
             <span aria-hidden="true">⌕</span>
@@ -124,9 +134,9 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
         </nav>
 
         <div className="library-toolbar" aria-label="作品筛选信息">
-          <button type="button">筛选</button>
+          <span className="toolbar-filter">筛选</span>
           <span className="is-active">最近更新</span>
-          <span>尺寸分组</span>
+          <span>按尺寸分组</span>
           <span>{filteredWorks.length} 件作品</span>
         </div>
 
@@ -161,13 +171,15 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
                       <span className="asset-copy">
                         <span className="asset-title-line">
                           <i aria-hidden="true" />
-                          <strong>{work.title}</strong>
+                          <strong title={work.title}>{work.title}</strong>
                           <em>{work.accessNote}</em>
                         </span>
                         <span className="asset-meta">
-                          创作于 {work.year}　{work.dimensions.label}
+                          创作于 {work.year} · {work.dimensions.label}
                         </span>
-                        <span className="asset-links">百度网盘 / 夸克网盘</span>
+                        <span className="asset-links">
+                          {hasPendingLinks(work) ? '网盘链接待补' : '百度网盘 / 夸克网盘'}
+                        </span>
                       </span>
                     </button>
                   ))}

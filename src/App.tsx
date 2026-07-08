@@ -15,7 +15,7 @@ function App() {
       </main>
       <footer className="site-footer-lite">
         <span>© 2026 画画的 o 泡 Visual Archive.</span>
-        <span>作品原图请在作品详情中查看百度网盘 / 夸克网盘入口。</span>
+        <span>原图链接会放在作品详情里，先用百度网盘 / 夸克网盘占位。</span>
       </footer>
       <WorkDetailModal work={selectedWork} onClose={() => setSelectedWork(null)} />
     </>

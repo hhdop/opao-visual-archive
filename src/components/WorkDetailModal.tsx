@@ -7,6 +7,18 @@ type WorkDetailModalProps = {
   onClose: () => void;
 };
 
+function renderDownloadLink(label: string, url: string) {
+  if (url === '#') {
+    return <span className="is-pending">{label}（待补）</span>;
+  }
+
+  return (
+    <a href={url} target="_blank" rel="noreferrer">
+      {label}
+    </a>
+  );
+}
+
 function WorkDetailModal({ work, onClose }: WorkDetailModalProps) {
   useEffect(() => {
     if (!work) {
@@ -45,29 +57,37 @@ function WorkDetailModal({ work, onClose }: WorkDetailModalProps) {
           <span className="modal-image-shell">
             <img src={work.cover} alt={work.title} />
           </span>
-          <figcaption>查看大图可打开原始作品文件</figcaption>
         </figure>
 
         <div className="modal-content">
           <p className="section-label">Artwork File</p>
           <h2 id="work-modal-title">{work.title}</h2>
 
-          <p className="modal-meta-line">创作于 {work.year}　{work.dimensions.label}</p>
+          <dl className="modal-facts">
+            <div>
+              <dt>创作时间</dt>
+              <dd>{work.year}</dd>
+            </div>
+            <div>
+              <dt>图片尺寸</dt>
+              <dd>{work.dimensions.label}</dd>
+            </div>
+          </dl>
 
           <div className="modal-access" aria-label="作品原图领取入口">
             <p>原图领取</p>
             <div>
-              <a href={work.downloadLinks.baidu}>百度网盘</a>
-              <a href={work.downloadLinks.quark}>夸克网盘</a>
+              {renderDownloadLink('百度网盘', work.downloadLinks.baidu)}
+              {renderDownloadLink('夸克网盘', work.downloadLinks.quark)}
             </div>
           </div>
 
           <div className="modal-actions">
             <a className="button button-line" href={work.detailImages[0] ?? work.cover} target="_blank" rel="noreferrer">
-              查看大图
+              查看预览图
             </a>
             <button className="button button-line" type="button" onClick={onClose}>
-              返回归档
+              返回作品库
             </button>
           </div>
         </div>
