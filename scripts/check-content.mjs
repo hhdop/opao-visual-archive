@@ -35,7 +35,7 @@ function isSafeExternalUrl(value) {
 
   try {
     const url = new URL(value);
-    return url.protocol === 'https:' || url.protocol === 'http:';
+    return url.protocol === 'https:';
   } catch {
     return false;
   }
@@ -128,7 +128,7 @@ function validateWork(work, index, seenIds, seenSortOrders) {
 
   for (const [provider, url] of Object.entries(work.downloadLinks ?? {})) {
     if (typeof url !== 'string' || !isSafeExternalUrl(url)) {
-      reportError(`${label}: ${provider} link must be #, http, or https.`);
+      reportError(`${label}: ${provider} link must be # or https.`);
     }
   }
 }

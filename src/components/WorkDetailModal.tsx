@@ -14,7 +14,7 @@ function getSafeExternalUrl(url: string) {
 
   try {
     const parsedUrl = new URL(url);
-    return parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:' ? parsedUrl.href : null;
+    return parsedUrl.protocol === 'https:' ? parsedUrl.href : null;
   } catch {
     return null;
   }
