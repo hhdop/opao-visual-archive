@@ -411,6 +411,31 @@ a {
   font-size: 22px;
 }
 
+.library-more {
+  display: flex;
+  justify-content: center;
+  margin-top: 64px;
+}
+
+.library-more button {
+  min-width: 176px;
+  min-height: 48px;
+  padding: 12px 20px;
+  border: 1px solid var(--line-strong);
+  background: #fff;
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 900;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.library-more button:hover {
+  border-color: var(--ink);
+  box-shadow: 0 10px 26px rgba(25, 26, 29, 0.08);
+  transform: translateY(-2px);
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;
@@ -694,6 +719,10 @@ a {
   .asset-grid.is-landscape {
     grid-template-columns: 1fr;
     gap: 42px;
+  }
+
+  .library-more {
+    margin-top: 48px;
   }
 
   .modal-backdrop {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
+import { useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { Work } from '../data/works';
 
 type MaterialLibraryProps = {
@@ -27,6 +27,7 @@ const libraryFilters: Array<{ label: string; value: Work['orientation'] | 'All' 
 ];
 
 const preferredSubjects = ['华晨宇', '侯明昊', '檀健次', '个人练习'];
+const pageSize = 20;
 
 type SortMode = 'recent' | 'created';
 
@@ -109,6 +110,8 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
   const [activeSubject, setActiveSubject] = useState('全部');
   const [sortMode, setSortMode] = useState<SortMode>('recent');
   const [query, setQuery] = useState('');
+  const [visibleCount, setVisibleCount] = useState(pageSize);
+  const deferredQuery = useDeferredValue(query);
 
   const subjectFilters = useMemo(() => {
     const availableSubjects = new Set(works.map((work) => work.subject));
@@ -121,7 +124,7 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
   }, [works]);
 
   const filteredWorks = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
+    const normalizedQuery = deferredQuery.trim().toLowerCase();
 
     return works
       .filter((work) => {
@@ -146,12 +149,21 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
 
         return b.sortOrder - a.sortOrder;
       });
-  }, [activeFilter, activeSubject, query, sortMode, works]);
+  }, [activeFilter, activeSubject, deferredQuery, sortMode, works]);
+
+  useEffect(() => {
+    setVisibleCount(pageSize);
+  }, [activeFilter, activeSubject, deferredQuery, sortMode]);
+
+  const visibleWorks = useMemo(
+    () => filteredWorks.slice(0, visibleCount),
+    [filteredWorks, visibleCount],
+  );
 
   const groups = useMemo(() => {
     const groupMap = new Map<string, LibraryGroup>();
 
-    filteredWorks.forEach((work, index) => {
+    visibleWorks.forEach((work, index) => {
       const title = getGroupTitle(work);
       const key = `${work.orientation}-${work.dimensions.width}x${work.dimensions.height}`;
 
@@ -175,7 +187,9 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
 
       return aOrder - bOrder || b.works.length - a.works.length || a.firstIndex - b.firstIndex;
     });
-  }, [filteredWorks]);
+  }, [visibleWorks]);
+
+  const hasMoreWorks = filteredWorks.length > visibleWorks.length;
 
   return (
     <section className="library-page" id="home" aria-labelledby="library-title">
@@ -289,6 +303,14 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
             </div>
           )}
         </div>
+
+        {hasMoreWorks ? (
+          <div className="library-more">
+            <button type="button" onClick={() => setVisibleCount((currentCount) => currentCount + pageSize)}>
+              加载更多作品
+            </button>
+          </div>
+        ) : null}
       </div>
     </section>
   );
