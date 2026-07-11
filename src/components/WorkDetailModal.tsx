@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import type { Work } from '../data/works';
 
 type WorkDetailModalProps = {
@@ -35,19 +35,56 @@ function renderDownloadLink(label: string, url: string) {
 }
 
 function WorkDetailModal({ work, onClose }: WorkDetailModalProps) {
+  const dialogRef = useRef<HTMLElement>(null);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+
   useEffect(() => {
     if (!work) {
       return;
     }
 
+    previouslyFocusedRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    window.requestAnimationFrame(() => closeButtonRef.current?.focus());
+
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         onClose();
+        return;
+      }
+
+      if (event.key !== 'Tab' || !dialogRef.current) {
+        return;
+      }
+
+      const focusableElements = dialogRef.current.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+
+      if (!firstElement || !lastElement) {
+        return;
+      }
+
+      if (event.shiftKey && document.activeElement === firstElement) {
+        event.preventDefault();
+        lastElement.focus();
+      } else if (!event.shiftKey && document.activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus();
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+      window.requestAnimationFrame(() => previouslyFocusedRef.current?.focus());
+    };
   }, [onClose, work]);
 
   if (!work) {
@@ -57,6 +94,7 @@ function WorkDetailModal({ work, onClose }: WorkDetailModalProps) {
   return (
     <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>
       <section
+        ref={dialogRef}
         className={`work-modal is-${work.orientation}`}
         role="dialog"
         aria-modal="true"
@@ -64,7 +102,7 @@ function WorkDetailModal({ work, onClose }: WorkDetailModalProps) {
         onMouseDown={(event) => event.stopPropagation()}
         style={{ '--work-aspect': work.aspectRatio, '--focus': work.focus } as CSSProperties}
       >
-        <button className="modal-close" type="button" onClick={onClose} aria-label="关闭作品详情">
+        <button ref={closeButtonRef} className="modal-close" type="button" onClick={onClose} aria-label="关闭作品详情">
           ×
         </button>
 
