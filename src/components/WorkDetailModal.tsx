@@ -7,13 +7,28 @@ type WorkDetailModalProps = {
   onClose: () => void;
 };
 
-function renderDownloadLink(label: string, url: string) {
+function getSafeExternalUrl(url: string) {
   if (url === '#') {
+    return null;
+  }
+
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.protocol === 'https:' || parsedUrl.protocol === 'http:' ? parsedUrl.href : null;
+  } catch {
+    return null;
+  }
+}
+
+function renderDownloadLink(label: string, url: string) {
+  const safeUrl = getSafeExternalUrl(url);
+
+  if (!safeUrl) {
     return <span className="is-pending">{label}（待补）</span>;
   }
 
   return (
-    <a href={url} target="_blank" rel="noreferrer">
+    <a href={safeUrl} target="_blank" rel="noreferrer" referrerPolicy="no-referrer">
       {label}
     </a>
   );
@@ -55,7 +70,7 @@ function WorkDetailModal({ work, onClose }: WorkDetailModalProps) {
 
         <figure className={`modal-artwork is-${work.orientation}`}>
           <span className="modal-image-shell">
-            <img src={work.cover} alt={work.title} />
+            <img src={work.cover} alt={work.title} decoding="async" />
           </span>
         </figure>
 
@@ -83,7 +98,13 @@ function WorkDetailModal({ work, onClose }: WorkDetailModalProps) {
           </div>
 
           <div className="modal-actions">
-            <a className="button button-line" href={work.detailImages[0] ?? work.cover} target="_blank" rel="noreferrer">
+            <a
+              className="button button-line"
+              href={work.detailImages[0] ?? work.cover}
+              target="_blank"
+              rel="noreferrer"
+              referrerPolicy="no-referrer"
+            >
               查看预览图
             </a>
             <button className="button button-line" type="button" onClick={onClose}>

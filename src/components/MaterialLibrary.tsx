@@ -1,4 +1,4 @@
-import { useMemo, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { Work } from '../data/works';
 
 type MaterialLibraryProps = {
@@ -14,6 +14,11 @@ type LibraryGroup = {
   works: Work[];
 };
 
+type AssetThumbnailProps = {
+  cover: string;
+  priority: boolean;
+};
+
 const libraryFilters: Array<{ label: string; value: Work['orientation'] | 'All' }> = [
   { label: '全部', value: 'All' },
   { label: '竖图', value: 'portrait' },
@@ -21,7 +26,9 @@ const libraryFilters: Array<{ label: string; value: Work['orientation'] | 'All' 
   { label: '方图', value: 'square' },
 ];
 
-const subjectFilters = ['全部', '华晨宇', '侯明昊', '檀健次', '个人练习'] as const;
+const preferredSubjects = ['华晨宇', '侯明昊', '檀健次', '个人练习'];
+
+type SortMode = 'recent' | 'created';
 
 function getOrientationLabel(work: Work) {
   if (work.orientation === 'landscape') {
@@ -59,15 +66,65 @@ function hasPendingLinks(work: Work) {
   return work.downloadLinks.baidu === '#' && work.downloadLinks.quark === '#';
 }
 
+function AssetThumbnail({ cover, priority }: AssetThumbnailProps) {
+  const thumbnailRef = useRef<HTMLSpanElement>(null);
+  const [shouldLoad, setShouldLoad] = useState(priority);
+
+  useEffect(() => {
+    if (shouldLoad || !thumbnailRef.current) {
+      return;
+    }
+
+    if (!('IntersectionObserver' in window)) {
+      setShouldLoad(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldLoad(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '720px 0px' },
+    );
+
+    observer.observe(thumbnailRef.current);
+    return () => observer.disconnect();
+  }, [shouldLoad]);
+
+  return (
+    <span
+      ref={thumbnailRef}
+      className={`asset-thumb${shouldLoad ? ' is-loaded' : ''}`}
+      style={shouldLoad ? ({ '--cover': `url(${cover})` } as CSSProperties) : undefined}
+      aria-hidden="true"
+    />
+  );
+}
+
 function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
   const [activeFilter, setActiveFilter] = useState<Work['orientation'] | 'All'>('All');
-  const [activeSubject, setActiveSubject] = useState<(typeof subjectFilters)[number]>('全部');
+  const [activeSubject, setActiveSubject] = useState('全部');
+  const [sortMode, setSortMode] = useState<SortMode>('recent');
   const [query, setQuery] = useState('');
+
+  const subjectFilters = useMemo(() => {
+    const availableSubjects = new Set(works.map((work) => work.subject));
+    const orderedSubjects = preferredSubjects.filter((subject) => availableSubjects.has(subject) || subject === '侯明昊');
+    const additionalSubjects = [...availableSubjects]
+      .filter((subject) => !preferredSubjects.includes(subject))
+      .sort((a, b) => a.localeCompare(b, 'zh-Hans-CN'));
+
+    return ['全部', ...orderedSubjects, ...additionalSubjects];
+  }, [works]);
 
   const filteredWorks = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    return works.filter((work) => {
+    return works
+      .filter((work) => {
       const matchesFilter = activeFilter === 'All' || work.orientation === activeFilter;
       const matchesSubject = activeSubject === '全部' || getWorkSubject(work) === activeSubject;
       const searchableText = [
@@ -81,8 +138,15 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
         .toLowerCase();
 
       return matchesFilter && matchesSubject && (!normalizedQuery || searchableText.includes(normalizedQuery));
-    });
-  }, [activeFilter, activeSubject, query, works]);
+      })
+      .sort((a, b) => {
+        if (sortMode === 'created') {
+          return Number(b.year) - Number(a.year) || b.sortOrder - a.sortOrder;
+        }
+
+        return b.sortOrder - a.sortOrder;
+      });
+  }, [activeFilter, activeSubject, query, sortMode, works]);
 
   const groups = useMemo(() => {
     const groupMap = new Map<string, LibraryGroup>();
@@ -144,7 +208,22 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
 
         <div className="library-toolbar" aria-label="作品筛选信息">
           <span className="toolbar-filter">筛选</span>
-          <span className="is-active">最近更新</span>
+          <div className="sort-filters" aria-label="作品排序">
+            <button
+              type="button"
+              className={sortMode === 'recent' ? 'is-active' : ''}
+              onClick={() => setSortMode('recent')}
+            >
+              最近更新
+            </button>
+            <button
+              type="button"
+              className={sortMode === 'created' ? 'is-active' : ''}
+              onClick={() => setSortMode('created')}
+            >
+              创作时间
+            </button>
+          </div>
           <div className="subject-filters" aria-label="人物分类">
             {subjectFilters.map((subject) => (
               <button
@@ -171,7 +250,7 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
                 </div>
 
                 <div className={`asset-grid is-${group.works[0]?.orientation ?? 'portrait'}`}>
-                  {group.works.map((work) => (
+                  {group.works.map((work, workIndex) => (
                     <button
                       className={`asset-card is-${work.orientation}`}
                       type="button"
@@ -179,13 +258,12 @@ function MaterialLibrary({ works, onSelectWork }: MaterialLibraryProps) {
                       onClick={() => onSelectWork(work)}
                       style={
                         {
-                          '--cover': `url(${work.cover})`,
                           '--focus': work.focus,
                           '--work-aspect': work.aspectRatio,
                         } as CSSProperties
                       }
                     >
-                      <span className="asset-thumb" aria-hidden="true" />
+                      <AssetThumbnail cover={work.cover} priority={group.firstIndex === 0 && workIndex < 5} />
                       <span className="asset-copy">
                         <span className="asset-title-line">
                           <i aria-hidden="true" />

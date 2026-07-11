@@ -4,13 +4,14 @@ export type WorkCategory =
   | 'Original Sketches'
   | 'Commission Reference';
 
-export type WorkSubject = '华晨宇' | '侯明昊' | '檀健次' | '个人练习' | '其他';
+export type WorkSubject = string;
 
 export type Work = {
   id: string;
   title: string;
   category: WorkCategory;
   subject: WorkSubject;
+  sortOrder: number;
   cover: string;
   year: string;
   description: string;
@@ -44,6 +45,7 @@ export const works: Work[] = [
     title: '25-0412-华晨宇',
     category: 'Fan Portraits',
     subject: '华晨宇',
+    sortOrder: 120,
     cover: 'works/huahua-2025-0412-preview.webp',
     year: '2025',
     description: '',
@@ -67,6 +69,7 @@ export const works: Work[] = [
     title: '红发-华晨宇',
     category: 'Fan Portraits',
     subject: '华晨宇',
+    sortOrder: 110,
     cover: 'works/honfa-preview.webp',
     year: '2026',
     description: '',
@@ -90,6 +93,7 @@ export const works: Work[] = [
     title: '粉丝投稿-檀健次',
     category: 'Fan Portraits',
     subject: '檀健次',
+    sortOrder: 100,
     cover: 'works/tjc-preview.webp',
     year: '2026',
     description: '',
@@ -113,6 +117,7 @@ export const works: Work[] = [
     title: '花花4.1难度高-华晨宇',
     category: 'Fan Portraits',
     subject: '华晨宇',
+    sortOrder: 90,
     cover: 'works/huahua-0401-preview.webp',
     year: '2026',
     description: '',
@@ -136,6 +141,7 @@ export const works: Work[] = [
     title: '花花风景-华晨宇',
     category: 'Selected Works',
     subject: '华晨宇',
+    sortOrder: 80,
     cover: 'works/huahua-field-preview.webp',
     year: '2026',
     description: '',
@@ -159,6 +165,7 @@ export const works: Work[] = [
     title: '花花红发1-华晨宇',
     category: 'Fan Portraits',
     subject: '华晨宇',
+    sortOrder: 70,
     cover: 'works/huahua-red-1-preview.webp',
     year: '2026',
     description: '',
@@ -182,6 +189,7 @@ export const works: Work[] = [
     title: '花花红发躺-华晨宇',
     category: 'Fan Portraits',
     subject: '华晨宇',
+    sortOrder: 60,
     cover: 'works/huahua-red-recline-preview.webp',
     year: '2026',
     description: '',
@@ -205,6 +213,7 @@ export const works: Work[] = [
     title: '花花红发3-华晨宇',
     category: 'Fan Portraits',
     subject: '华晨宇',
+    sortOrder: 50,
     cover: 'works/huahua-red-3-preview.webp',
     year: '2026',
     description: '',
@@ -228,6 +237,7 @@ export const works: Work[] = [
     title: '花花-华晨宇',
     category: 'Fan Portraits',
     subject: '华晨宇',
+    sortOrder: 40,
     cover: 'works/huahua-white-preview.webp',
     year: '2026',
     description: '',
@@ -251,6 +261,7 @@ export const works: Work[] = [
     title: '花花碎盖-华晨宇',
     category: 'Fan Portraits',
     subject: '华晨宇',
+    sortOrder: 30,
     cover: 'works/huahua-bangs-preview.webp',
     year: '2026',
     description: '',
@@ -274,6 +285,7 @@ export const works: Work[] = [
     title: '23-1112-个人练习',
     category: 'Original Sketches',
     subject: '个人练习',
+    sortOrder: 20,
     cover: 'works/portrait-1126-preview.webp',
     year: '2023',
     description: '',
@@ -297,6 +309,7 @@ export const works: Work[] = [
     title: '黄昏战神-华晨宇',
     category: 'Fan Portraits',
     subject: '华晨宇',
+    sortOrder: 10,
     cover: 'works/huahua-dusk-preview.webp',
     year: '2026',
     description: '',
