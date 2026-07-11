@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1 --port 5174 --strictPort",
-    "build": "tsc && vite build",
+    "check:content": "node scripts/check-content.mjs",
+    "build": "node scripts/check-content.mjs && tsc && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4174 --strictPort"
   },
   "dependencies": {
