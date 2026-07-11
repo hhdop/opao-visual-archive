@@ -36,25 +36,7 @@ function getOrientationLabel(work: Work) {
 }
 
 function getWorkSubject(work: Work) {
-  const source = `${work.title} ${work.tags.join(' ')}`;
-
-  if (source.includes('华晨宇')) {
-    return '华晨宇';
-  }
-
-  if (source.includes('侯明昊')) {
-    return '侯明昊';
-  }
-
-  if (source.includes('檀健次')) {
-    return '檀健次';
-  }
-
-  if (source.includes('个人练习') || source.includes('原创练习')) {
-    return '个人练习';
-  }
-
-  return '其他';
+  return work.subject;
 }
 
 function getGroupTitle(work: Work) {
