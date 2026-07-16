@@ -1,5 +1,6 @@
 import { useDeferredValue, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import type { Work } from '../data/works';
+import { toCssAssetUrl } from '../utils/assets';
 
 type MaterialLibraryProps = {
   works: Work[];
@@ -99,7 +100,7 @@ function AssetThumbnail({ cover, priority }: AssetThumbnailProps) {
     <span
       ref={thumbnailRef}
       className={`asset-thumb${shouldLoad ? ' is-loaded' : ''}`}
-      style={shouldLoad ? ({ '--cover': `url(${cover})` } as CSSProperties) : undefined}
+      style={shouldLoad ? ({ '--cover': toCssAssetUrl(cover) } as CSSProperties) : undefined}
       aria-hidden="true"
     />
   );

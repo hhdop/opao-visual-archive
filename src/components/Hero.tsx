@@ -1,5 +1,6 @@
 import { type CSSProperties, type PointerEvent, useState } from 'react';
 import type { Work } from '../data/works';
+import { toCssAssetUrl } from '../utils/assets';
 
 type HeroProps = {
   works: Work[];
@@ -114,7 +115,7 @@ function Hero({ works, onSelectWork }: HeroProps) {
                   type="button"
                   key={work.id}
                   onClick={() => onSelectWork(work)}
-                  style={{ '--cover': `url(${work.cover})`, '--focus': work.focus } as CSSProperties}
+                  style={{ '--cover': toCssAssetUrl(work.cover), '--focus': work.focus } as CSSProperties}
                   aria-label={`查看 ${work.title}`}
                 />
               ))}
@@ -134,7 +135,7 @@ function Hero({ works, onSelectWork }: HeroProps) {
               type="button"
               key={work.id}
               onClick={() => onSelectWork(work)}
-              style={{ '--cover': `url(${work.cover})`, '--focus': work.focus } as CSSProperties}
+              style={{ '--cover': toCssAssetUrl(work.cover), '--focus': work.focus } as CSSProperties}
             >
               <span>No. {String(index + 1).padStart(2, '0')}</span>
               <strong>{work.title}</strong>

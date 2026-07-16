@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { Work } from '../data/works';
+import { toCssAssetUrl } from '../utils/assets';
 
 type FeaturedWorksProps = {
   works: Work[];
@@ -31,7 +32,7 @@ function FeaturedWorks({ works, onSelectWork }: FeaturedWorksProps) {
             className={`featured-lead artwork-surface is-${lead.orientation}`}
             type="button"
             onClick={() => onSelectWork(lead)}
-            style={{ '--cover': `url(${lead.cover})` } as CSSProperties}
+            style={{ '--cover': toCssAssetUrl(lead.cover) } as CSSProperties}
           >
             <span className="featured-ribbon">Selected Cover</span>
             <span className="featured-info">

@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { Work } from '../data/works';
+import { toCssAssetUrl } from '../utils/assets';
 
 type WorkCardProps = {
   work: Work;
@@ -17,7 +18,7 @@ function WorkCard({ work, index, onSelect }: WorkCardProps) {
       onClick={onSelect}
       style={
         {
-          '--cover': `url(${work.cover})`,
+          '--cover': toCssAssetUrl(work.cover),
           '--focus': work.focus,
           '--work-aspect': work.aspectRatio,
         } as CSSProperties
